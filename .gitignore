@@ -11,10 +11,13 @@ package-lock.json
 .daypass/
 
 # --- Working documents, not part of the submission ---
-BUILD.md          # phase plan + gates
-KNOWLEDGE.md      # research findings
-DEMO.md           # demo script + narration
-SUBMIT.md         # portal handoff notes
+# BUILD.md phase plan + gates  |  KNOWLEDGE.md research findings
+# DEMO.md demo script + narration  |  SUBMIT.md portal handoff notes
+# (gitignore supports no inline comment: a "#" after a pattern becomes part of it.)
+BUILD.md
+KNOWLEDGE.md
+DEMO.md
+SUBMIT.md
 CHEATSHEET.md
 PRODUCT.md
 
