@@ -22,6 +22,7 @@ const payer = privateKeyToAccount(
 
 // Module-scope constants read these, so they must be set before the sources are imported.
 process.env.DAYPASS_PAY_TO = PAY_TO;
+process.env.PUBLIC_URL = "https://merchant.example";
 process.env.DAYPASS_STORE = join(mkdtempSync(join(tmpdir(), "daypass-x402-")), "passes.json");
 
 const { merchant } = await import("../src/merchant/routes.js");
@@ -104,6 +105,12 @@ check("challenge targets Base", accepts?.network === "base");
 check("challenge amount matches the published offer", accepts?.maxAmountRequired === PRICE, accepts?.maxAmountRequired);
 check("challenge pays to the merchant address", accepts?.payTo?.toLowerCase() === PAY_TO.toLowerCase());
 check("challenge names the USDC asset", accepts?.asset?.toLowerCase().startsWith("0x833589"), accepts?.asset);
+check(
+  "challenge resource is the public URL, not the proxy's internal origin",
+  accepts?.resource === "https://merchant.example/v1/passes?offer=northwind-quote-hour",
+  accepts?.resource,
+);
+check("challenge declares a mime type", accepts?.mimeType === "application/json");
 check(
   "the merchant's required amount equals the plugin's maxAmount, so PayBox will not reject the proposal",
   accepts?.maxAmountRequired === PRICE,

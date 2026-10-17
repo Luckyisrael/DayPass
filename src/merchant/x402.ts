@@ -44,6 +44,21 @@ async function readBody(ctx: Context): Promise<{ offerId?: string } | null> {
   }
 }
 
+/**
+ * The externally reachable URL of this request, for the challenge's `resource`.
+ *
+ * `ctx.req.url` reports the origin the proxy used — on Render that is
+ * `http://localhost:10000`, which is the wrong scheme and an address nobody outside can
+ * reach. The payment preview shows this field, so prefer the configured PUBLIC_URL and fall
+ * back to the Host header.
+ */
+function publicUrl(ctx: Context): string {
+  const { pathname, search } = new URL(ctx.req.url);
+  const base = (process.env.PUBLIC_URL ?? "").replace(/\/$/, "");
+  const host = ctx.req.header("host");
+  return `${base || (host ? `https://${host}` : "")}${pathname}${search}`;
+}
+
 /** POST /v1/passes — unpaid gets a challenge, paid gets a pass. */
 export async function mintWithPayment(ctx: Context) {
   // Fail with a diagnosis, not a bare 500. A merchant that cannot say where payment must
@@ -82,7 +97,7 @@ export async function mintWithPayment(ctx: Context) {
         accepts: [
           buildAccepts({
             amountUsd: offer.priceUsd,
-            resource: ctx.req.url,
+            resource: publicUrl(ctx),
             description: `${offer.business} — ${offer.name}`,
             payTo: payToAddress(),
           }),
