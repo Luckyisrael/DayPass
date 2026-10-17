@@ -14,6 +14,8 @@ import { privateKeyToAccount } from "viem/accounts";
 import { recoverTypedDataAddress } from "viem";
 
 const PAY_TO = "0x441035c24111a37c19e092cf13ae59d38d02985e";
+// Hardhat Account #1 — a widely published test key that secures nothing. It signs a fake
+// payment locally, so the whole x402 path can be exercised end to end without moving real USDC.
 const payer = privateKeyToAccount(
   "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
 );

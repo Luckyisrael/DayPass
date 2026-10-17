@@ -14,6 +14,8 @@ import {
   verifyPaymentProof,
 } from "../src/plugin/payment.js";
 
+// Hardhat Account #1 — a publicly documented test key that secures nothing. Signing with it
+// lets every check below run offline, with no wallet and no network.
 const account = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d" as const);
 
 const PAY_TO = "0x441035c24111a37c19e092cf13ae59d38d02985e";
@@ -90,6 +92,7 @@ const expiredRes = await verifyPaymentProof(expired, expected);
 check(!expiredRes.ok && expiredRes.reason === "expired", "expired proof rejected", JSON.stringify(expiredRes));
 
 // 6. A proof that claims someone else's `from` but is signed by an unrelated key rejected.
+// The unrelated key is Hardhat Account #3, another publicly published test key.
 const victim = account.address;
 const stranger = privateKeyToAccount("0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba" as const);
 const forged = await makeProof({ claimFrom: victim, signWith: stranger });

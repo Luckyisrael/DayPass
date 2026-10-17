@@ -59,7 +59,9 @@ async function handleMerchant(req: IncomingMessage, res: ServerResponse, url: st
   const request = new Request(`http://localhost:${PORT}${url}`, {
     method,
     headers: req.headers as HeadersInit,
-    ...(body === undefined ? {} : { body }),
+    // Uint8Array rather than Buffer: Node's fetch accepts both, but only Uint8Array is
+    // structurally a BodyInit, so the Buffer fails type-checking.
+    ...(body === undefined ? {} : { body: new Uint8Array(body) }),
   });
 
   try {

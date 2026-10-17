@@ -56,6 +56,8 @@ if (supplied) {
   const { USDC_DOMAIN, TRANSFER_WITH_AUTHORIZATION, usdToAtomic } = await import(
     "../src/plugin/payment.js"
   );
+  // Hardhat Account #1 — a publicly documented test key that secures nothing. It signs a fake
+  // local payment so the demo can run without a wallet or any real funds.
   const acct = privateKeyToAccount(
     "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
   );
