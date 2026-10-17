@@ -24,6 +24,11 @@ export function payToAddress(): string {
   return PAY_TO;
 }
 
+/** True when the merchant cannot state where payment must land, so every mint would fail. */
+export function misconfigured(): boolean {
+  return !/^0x[0-9a-fA-F]{40}$/.test(PAY_TO);
+}
+
 function offerFrom(ctx: Context, body: { offerId?: string } | null): Offer | undefined {
   const id = ctx.req.query("offer") ?? body?.offerId;
   return id ? findOffer(id) : undefined;
@@ -41,6 +46,19 @@ async function readBody(ctx: Context): Promise<{ offerId?: string } | null> {
 
 /** POST /v1/passes — unpaid gets a challenge, paid gets a pass. */
 export async function mintWithPayment(ctx: Context) {
+  // Fail with a diagnosis, not a bare 500. A merchant that cannot say where payment must
+  // land cannot quote a price either, and the operator needs to be told which env to set.
+  if (misconfigured()) {
+    return ctx.json(
+      {
+        error: "merchant_not_configured",
+        message:
+          "DAYPASS_PAY_TO is unset or not a 0x address, so this merchant cannot state where payment must land. Set it on the service and redeploy.",
+      },
+      503,
+    );
+  }
+
   const body = await readBody(ctx);
   const offer = offerFrom(ctx, body);
 

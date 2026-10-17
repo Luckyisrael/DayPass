@@ -3,10 +3,21 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { registerTools } from "./tools/index.js";
 import { merchant } from "../merchant/routes.js";
+import { misconfigured } from "../merchant/x402.js";
 
 const PORT = Number(process.env.PORT ?? 8787);
 const VERSION = "0.1.0";
 const startedAt = Date.now();
+
+// Loud, early, and on stdout so it lands in the service log. A merchant without a receiving
+// address cannot say where payment must land, so every purchase would fail with a 503 — better
+// to see it in the log than to discover it from the first buyer.
+if (misconfigured()) {
+  console.error(
+    "[daypass] DAYPASS_PAY_TO is unset or not a 0x address — every purchase will fail with 503. " +
+      "Set it on this service and redeploy.",
+  );
+}
 
 function buildServer(): McpServer {
   const server = new McpServer({ name: "daypass", version: VERSION });
