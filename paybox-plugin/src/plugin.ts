@@ -7,6 +7,12 @@ const PROTOCOL_VERSION = "2026-07-28";
 const PLUGIN_NAME = "daypass";
 const PLUGIN_VERSION = "0.1.0";
 const USDC_ASSET = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
+/** EIP-55 checksummed form of the same address. `proposeX402` emits the asset lowercase, but
+ *  PayBox verifies the merchant's 402 challenge against this proposal, and both the merchant
+ *  and PayBox's documented example use the checksummed form. Emitting one canonical string
+ *  removes case sensitivity from that comparison. */
+const USDC_CHECKSUMMED = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
+const PROPOSAL_KEY = "io.paybox/transactionProposal";
 const FETCH_TIMEOUT_MS = 4_000;
 
 /**
@@ -169,13 +175,20 @@ function createServer() {
       }
       const url = new URL("/v1/passes", merchantOrigin());
       url.searchParams.set("offer", offer.id);
-      return proposeX402({
+      const result = proposeX402({
         chain: "eip155:8453",
         url: url.toString(),
         method: "POST",
         body: { offerId: offer.id },
         maxAmount: offer.priceAtomic,
       });
+      // Rewriting one field, not rebuilding the envelope: the builder stays authoritative for
+      // version, expiry and shape. Only the asset's case is normalised.
+      const proposal = {
+        ...result.structuredContent[PROPOSAL_KEY],
+        payment: { ...result.structuredContent[PROPOSAL_KEY].payment, asset: USDC_CHECKSUMMED },
+      };
+      return { ...result, structuredContent: { ...result.structuredContent, [PROPOSAL_KEY]: proposal } };
     },
   );
 

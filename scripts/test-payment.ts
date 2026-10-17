@@ -120,10 +120,25 @@ check(!deadRes.ok && deadRes.reason === "bad_signature", "off-curve signature re
 const garbage = await verifyPaymentProof("not-a-proof", expected);
 check(!garbage.ok && garbage.reason === "malformed_proof", "malformed proof rejected", JSON.stringify(garbage));
 
-// 9. The accepts contract we hand agents is internally consistent.
-const accepts = buildAccepts({ amountUsd: 0.5, description: "t", payTo: PAY_TO });
+// 9. The accepts contract we hand agents is internally consistent, and complete enough for a
+//    client parsing it with the standard x402 PaymentRequirements schema.
+const accepts = buildAccepts({
+  amountUsd: 0.5,
+  resource: "https://merchant.example/v1/passes?offer=acme-weather-day",
+  description: "t",
+  payTo: PAY_TO,
+});
 check(accepts.maxAmountRequired === "500000", "accepts amount is 500000 atomic (0.5 USDC)");
 check(accepts.network === "base" && accepts.extra.name === "USD Coin", "accepts targets USDC on Base");
+check(accepts.resource === "https://merchant.example/v1/passes?offer=acme-weather-day", "accepts names the resource");
+check(accepts.mimeType === "application/json", "accepts declares a mime type");
+check(
+  ["scheme", "network", "maxAmountRequired", "resource", "description", "mimeType", "payTo", "maxTimeoutSeconds", "asset", "extra"].every(
+    (k) => k in accepts,
+  ),
+  "accepts carries every field of the x402 PaymentRequirements schema",
+);
+check(accepts.asset === "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", "accepts asset is the EIP-55 checksummed USDC address");
 
 if (failures > 0) {
   console.error(`\n💥 PAYMENT TEST FAILED — ${failures} assertion(s).\n`);

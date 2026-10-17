@@ -82,6 +82,7 @@ export async function mintWithPayment(ctx: Context) {
         accepts: [
           buildAccepts({
             amountUsd: offer.priceUsd,
+            resource: ctx.req.url,
             description: `${offer.business} — ${offer.name}`,
             payTo: payToAddress(),
           }),

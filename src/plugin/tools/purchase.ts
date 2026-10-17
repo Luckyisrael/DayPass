@@ -33,6 +33,7 @@ export function registerPurchaseTools(server: McpServer): void {
 
       const accepts = buildAccepts({
         amountUsd: offer.priceUsd,
+        resource: offer.url,
         description: `${offer.business} — ${offer.name}`,
         payTo: PAY_TO,
       });

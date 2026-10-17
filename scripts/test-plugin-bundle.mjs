@@ -124,7 +124,11 @@ check("chain is Base", proposal?.chain === "eip155:8453");
 check("points at the merchant mint endpoint", proposal?.request?.url === `${MERCHANT}/v1/passes?offer=northwind-quote-hour`, proposal?.request?.url);
 check("posts the offer id", proposal?.request?.method === "POST" && proposal?.request?.body?.offerId === "northwind-quote-hour");
 check("maxAmount is the offer price", proposal?.payment?.maxAmount === "250000", proposal?.payment?.maxAmount);
-check("asset is Base USDC", (proposal?.payment?.asset ?? "").toLowerCase() === USDC);
+check("asset is Base USDC, EIP-55 checksummed",
+  proposal?.payment?.asset === "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+  proposal?.payment?.asset);
+check("proposal asset matches the merchant's challenge byte-for-byte",
+  (proposal?.payment?.asset ?? "").toLowerCase() === USDC);
 check("version is 1", proposal?.version === "1");
 const expiry = Date.parse(proposal?.expiresAt ?? "");
 check(

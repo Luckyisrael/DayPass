@@ -28,11 +28,19 @@ export const USDC_DOMAIN = {
   verifyingContract: USDC_BASE,
 } as const;
 
+/**
+ * One entry of the x402 `accepts` array. `resource` and `mimeType` are required by the x402
+ * `PaymentRequirements` schema — a client parsing the challenge with that schema rejects a
+ * response missing them, so they are emitted even though PayBox only documents verifying the
+ * asset and the amount.
+ */
 export interface Accepts {
   scheme: "exact";
   network: "base";
   maxAmountRequired: string;
+  resource: string;
   description: string;
+  mimeType: string;
   asset: string;
   payTo: string;
   maxTimeoutSeconds: number;
@@ -46,6 +54,8 @@ export function usdToAtomic(amountUsd: number): string {
 /** The 402 contract an agent hands to `pay_x402`. */
 export function buildAccepts(params: {
   amountUsd: number;
+  /** The exact URL being paid for; becomes the challenge's `resource`. */
+  resource: string;
   description: string;
   payTo: string;
 }): Accepts {
@@ -53,7 +63,11 @@ export function buildAccepts(params: {
     scheme: "exact",
     network: "base",
     maxAmountRequired: usdToAtomic(params.amountUsd),
+    resource: params.resource,
     description: params.description,
+    mimeType: "application/json",
+    // EIP-55 checksummed, matching PayBox's documented example. The plugin's proposal is
+    // normalised to the same form, because PayBox compares the challenge against the proposal.
     asset: USDC_BASE,
     payTo: params.payTo,
     maxTimeoutSeconds: 600,
