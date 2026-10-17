@@ -1,0 +1,47 @@
+{
+  "name": "payboxhackathon",
+  "version": "1.0.0",
+  "description": "PayBox marketplace plugin build - MoonPay Hackathons Chapter 1 (Oct 16-17, 2026)",
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:plugin && npm run test:payment && npm run test:entitlement && npm run test:merchant && npm run test:x402 && npm run test:bundle",
+    "test:plugin": "tsx scripts/test-mcp-client.ts",
+    "test:payment": "tsx scripts/test-payment.ts",
+    "test:entitlement": "tsx scripts/test-entitlement.ts",
+    "test:merchant": "tsx scripts/test-merchant.ts",
+    "test:x402": "tsx scripts/test-merchant-x402.ts",
+    "test:bundle": "node scripts/test-plugin-bundle.mjs",
+    "start": "tsx src/plugin/server.ts",
+    "paybox": "paybox",
+    "whoami": "paybox --json whoami",
+    "credentials": "paybox --json credentials",
+    "plugins": "paybox --json plugins list",
+    "plugins:enabled": "paybox --json plugins list --status enabled",
+    "discover": "paybox --json discover",
+    "login": "paybox login --no-open",
+    "connect": "paybox connect --no-open",
+    "doctor": "paybox --json whoami && paybox --json credentials",
+    "demo": "tsx scripts/demo.ts",
+    "demo:stage": "tsx scripts/demo-stage.ts"
+  },
+  "keywords": [
+    "paybox",
+    "x402",
+    "mcp",
+    "hackathon"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@paybox-sh/sdk": "^2.2.0",
+    "hono": "^4.13.13",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "viem": "^2.40.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5"
+  }
+}

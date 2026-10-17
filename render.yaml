@@ -1,0 +1,32 @@
+# Render blueprint for the Daypass merchant.
+#
+# The merchant is the product's memory: the hosted plugin runs in a fresh sandbox with no
+# persistence, so every pass, credit and window lives here. That makes this service the one
+# piece that must outlive a restart.
+#
+# DURABILITY: Render's filesystem is ephemeral. Without a disk, passes vanish whenever the
+# service restarts or cold-starts after idling. Attach a Persistent Disk and point
+# DAYPASS_STORE at it (below) — otherwise a judge who buys a pass, leaves, and comes back
+# will find it gone.
+services:
+  - type: web
+    name: daypass-merchant
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "24.21.0"
+      # The USDC address that must receive payment before a pass is minted.
+      # Replace with your own receiving address before going live.
+      - key: DAYPASS_PAY_TO
+        sync: false
+      # Where offers are published. Only the path portion is used to route a pass's content.
+      - key: PUBLIC_URL
+        sync: false
+      # With a Persistent Disk mounted at /data, set this to /data/passes.json.
+      - key: DAYPASS_STORE
+        value: ".daypass/passes.json"
+        sync: false

@@ -1,0 +1,33 @@
+node_modules/
+package-lock.json
+.env
+.env.*
+*.log
+
+# PayBox local config — never commit credentials/keys
+.paybox/
+
+# sold passes must survive restarts locally
+.daypass/
+
+# --- Working documents, not part of the submission ---
+BUILD.md          # phase plan + gates
+KNOWLEDGE.md      # research findings
+DEMO.md           # demo script + narration
+SUBMIT.md         # portal handoff notes
+CHEATSHEET.md
+PRODUCT.md
+
+# --- Agent config and scratch ---
+.agents/
+opencode.json
+skills-lock.json
+pg.html
+pm.html
+
+# --- Reference dumps gathered during research; contains PayBox account data ---
+docs/
+data/
+
+# --- Rendered video and its source ---
+brag-output-*/
